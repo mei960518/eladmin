@@ -10,7 +10,7 @@ jobs:
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !GenerateChecksumStep
     name: generate pom checksum
-    files: '​**​/pom.xml'
+    files: ​**​/pom.xml
     targetFile: checksum
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !SetupCacheStep
@@ -19,23 +19,22 @@ jobs:
     loadKeys:
     - maven_repository
     paths:
-    - /root/.m2/repository  # 修正为容器内路径
+    - /root/.m2/repository
     uploadStrategy: UPLOAD_IF_NOT_HIT
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !CommandStep
     name: run tests
     runInContainer: true
-    image: maven:3.3.9-jdk-8  # 指定 Maven 3.3.9 + JDK 8 镜像
+    image: maven:3.3.9-jdk-8
     interpreter: !DefaultInterpreter
       commands: |
         export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
         mvn clean test -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
     useTTY: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
-  # 其余步骤保持不变...
   - !SetBuildVersionStep
     name: set build version
-    buildVersion: '@file:buildVersion@'
+    buildVersion: '1.0'
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
   - !PublishJUnitReportStep
     name: publish unit test report
