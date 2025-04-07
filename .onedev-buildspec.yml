@@ -1,4 +1,7 @@
 version: 39
+# 在OneDev的Docker执行器配置中追加
+environment:
+  DOCKER_REGISTRY_MIRROR: "https://registry.docker-cn.com"
 jobs:
 - name: maven ci
   steps:
@@ -25,7 +28,7 @@ jobs:
   - !CommandStep
     name: run tests
     runInContainer: true
-    image: registry.cn-hangzhou.aliyuncs.com/library/maven:3.3.9
+    image: maven:3.3.9-jdk-8
     interpreter: !DefaultInterpreter
       commands: |
         mvn clean test
@@ -34,7 +37,7 @@ jobs:
   - !CommandStep
     name: detect build version
     runInContainer: true
-    image: registry.cn-hangzhou.aliyuncs.com/library/maven:3.3.9
+    image: maven:3.3.9-jdk-8
     interpreter: !DefaultInterpreter
       commands: |
         export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
