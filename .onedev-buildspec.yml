@@ -8,11 +8,13 @@ jobs:
     withLfs: false
     withSubmodules: false
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   - !GenerateChecksumStep
     name: generate pom checksum
-    files: ​**​/pom.xml
+    files: **/pom.xml
     targetFile: checksum
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   - !SetupCacheStep
     name: set up maven cache
     key: maven_repository_@file:checksum@
@@ -22,6 +24,7 @@ jobs:
     - /root/.m2/repository
     uploadStrategy: UPLOAD_IF_NOT_HIT
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   - !CommandStep
     name: run tests
     runInContainer: true
@@ -32,21 +35,60 @@ jobs:
         mvn clean test -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
     useTTY: true
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   - !SetBuildVersionStep
     name: set build version
     buildVersion: '1.0'
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   - !PublishJUnitReportStep
     name: publish unit test report
     reportName: Unit Test
     filePatterns: '**/TEST-*.xml'
     condition: ALWAYS
-    
 
-    
+  - !CommandStep
+    name: package application
+    runInContainer: true
+    image: maven:3.3.9-jdk-8
+    interpreter: !DefaultInterpreter
+      commands: |
+        export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+        mvn clean package -DskipTests=true
+    artifacts:
+      - path: target/*.jar
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
+  - !CommandStep
+    name: deploy to server
+    runInContainer: true
+    image: appropriate/scp
+    environment:
+      - name: SERVER_USER
+        value: My
+      - name: SERVER_IP
+        value: 45.207.197.85
+      - name: SERVER_PATH
+        value: /root/test
+    secrets:
+      - DEPLOY_KEY: |
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
+          NhAAAAAwEAAQAAAgEA6ruOdKs2EqDJOBZ7+NVpC8//Ou1ifl1E3I2lZ1WZfEYA642+2QwF
+          CIsjoTd7SzzDWRBClw1damOupzH8dhvpvcE3YrNNvDfkjxaCa32614xeDbPxwuZ0mYoBws
+          ...
+          -----END OPENSSH PRIVATE KEY-----
+    interpreter: !DefaultInterpreter
+      commands: |
+        echo "$DEPLOY_KEY" > /tmp/id_rsa && chmod 600 /tmp/id_rsa
+        scp -i /tmp/id_rsa target/*.jar $SERVER_USER@$SERVER_IP:$SERVER_PATH
+        ssh -i /tmp/id_rsa $SERVER_USER@$SERVER_IP "bash -s" < ./path/to/start-script.sh
+    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
+
   triggers:
   - !BranchUpdateTrigger {}
   - !PullRequestUpdateTrigger {}
+
   retryCondition: never
   maxRetries: 3
   retryDelay: 30
