@@ -60,14 +60,6 @@ jobs:
     condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
 
 
-
-    interpreter: !DefaultInterpreter
-      commands: |
-        echo "$DEPLOY_KEY" > /tmp/id_rsa && chmod 600 /tmp/id_rsa
-        scp -i /tmp/id_rsa target/*.jar $SERVER_USER@$SERVER_IP:$SERVER_PATH
-        ssh -i /tmp/id_rsa $SERVER_USER@$SERVER_IP "bash -s" < ./path/to/start-script.sh
-    condition: ALL_PREVIOUS_STEPS_WERE_SUCCESSFUL
-
   triggers:
   - !BranchUpdateTrigger {}
   - !PullRequestUpdateTrigger {}
