@@ -46,14 +46,7 @@ jobs:
     name: deploy to server
     runInContainer: true
     image: alpine:latest
-    environment:
-      - name: SERVER_USER
-        value: My
-      - name: SERVER_IP
-        value: 45.207.197.85
-      - name: SERVER_PATH
-        value: /root/test
-  
+
   triggers:
   - !BranchUpdateTrigger {}
   - !PullRequestUpdateTrigger {}
