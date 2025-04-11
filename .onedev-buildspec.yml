@@ -70,14 +70,14 @@ jobs:
         value: 45.207.197.85
       - name: SERVER_PATH
         value: /root/test
-    secrets:
-      - DEPLOY_KEY: |
-          -----BEGIN OPENSSH PRIVATE KEY-----
-          b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
-          NhAAAAAwEAAQAAAgEA6ruOdKs2EqDJOBZ7+NVpC8//Ou1ifl1E3I2lZ1WZfEYA642+2QwF
-          CIsjoTd7SzzDWRBClw1damOupzH8dhvpvcE3YrNNvDfkjxaCa32614xeDbPxwuZ0mYoBws
-          ...
-          -----END OPENSSH PRIVATE KEY-----
+   # secrets:
+   #   - DEPLOY_KEY: |
+   #       -----BEGIN OPENSSH PRIVATE KEY-----
+   #       b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAACFwAAAAdzc2gtcn
+   #       NhAAAAAwEAAQAAAgEA6ruOdKs2EqDJOBZ7+NVpC8//Ou1ifl1E3I2lZ1WZfEYA642+2QwF
+   #       CIsjoTd7SzzDWRBClw1damOupzH8dhvpvcE3YrNNvDfkjxaCa32614xeDbPxwuZ0mYoBws
+   #       ...
+   #       -----END OPENSSH PRIVATE KEY-----
     interpreter: !DefaultInterpreter
       commands: |
         echo "$DEPLOY_KEY" > /tmp/id_rsa && chmod 600 /tmp/id_rsa
