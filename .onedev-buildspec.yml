@@ -41,11 +41,7 @@ jobs:
     reportName: Unit Test
     filePatterns: '**/TEST-*.xml'
     condition: ALWAYS
-    
-  - !CommandStep
-    name: deploy to server
-    runInContainer: true
-    image: alpine:latest
+
 
   triggers:
   - !BranchUpdateTrigger {}
